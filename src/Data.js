@@ -28,6 +28,18 @@ export const cardListMock = [
   },
 ];
 
+export const transactionListMock = [
+  {
+    transactionID: "1",
+    cardAccount: "1",
+    cardID: "1",
+    amount: "10",
+    currency: "AZN",
+    transactionDate: "10-02-2021",
+    merchantInfo: "name 1",
+  },
+];
+
 export const currencyListMock = ["AZN", "USD", "EUR"];
 
 export const STATUS_ACTIVE = "active";
