@@ -1,10 +1,11 @@
 import { Route, Switch } from "react-router-dom";
 import "./App.css";
 import { TransactionList, CardList, TransactionItem } from "./components";
-import Breadcrumb from "./components/Breadcrumb";
-import LinkList from "./components/LinkList";
+import Breadcrumb from "./Elements/Breadcrumb";
+import LinkList from "./Elements/LinkList";
 import CardItem from "./components/CardItem";
 import { cardListMock, transactionListMock } from "./Data";
+import { Box } from "@material-ui/core";
 
 function App() {
   const links = [
@@ -19,7 +20,7 @@ function App() {
   ];
 
   return (
-    <>
+    <Box padding={4}>
       <LinkList links={links} />
 
       <Breadcrumb />
@@ -31,14 +32,16 @@ function App() {
         />
         <Route
           path="/transactions"
-          component={() => <TransactionList list={transactionListMock} />}
+          component={() => (
+            <TransactionList transactionList={transactionListMock} />
+          )}
         />
         <Route
           path="/cards"
           component={() => <CardList list={cardListMock} />}
         />
       </Switch>
-    </>
+    </Box>
   );
 }
 
