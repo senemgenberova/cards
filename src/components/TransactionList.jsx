@@ -12,46 +12,69 @@ import {
   FormGroup,
   Paper,
   Box,
+  ButtonGroup,
+  Button,
 } from "@material-ui/core";
-import { currencyListMock, transactionListMock } from "../Data";
+import { currencyListMock } from "../Data";
 import CheckBox from "../Elements/CheckBox";
 import _ from "lodash";
+import { formatDate } from "../Utils";
+import Pagination from "../Elements/Pagination";
+
+const PER_PAGE = 10;
 
 const TransactionList = ({ transactionList }) => {
   const match = useRouteMatch();
 
   const [list, setList] = useState([]);
+
   const [search, setSearch] = useState({
     cardID: "",
     cardAccount: "",
     minAmount: "",
     maxAmount: "",
-    currency: [],
+    currencies: [],
     date: "",
   });
 
-  const { cardID, cardAccount, minAmount, maxAmount, currency, date } = search;
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const { cardID, cardAccount, minAmount, maxAmount, currencies, date } =
+    search;
 
   const filterProps = [
     {
-      filter: cardID,
+      label: "cardID",
+      value: cardID,
       attr: "cardID",
     },
     {
-      filter: cardAccount,
+      label: "cardAccount",
+      value: cardAccount,
       attr: "cardAccount",
     },
     {
-      filter: minAmount,
+      label: "Min amount",
+      type: "number",
+      value: minAmount,
       filterFunc: (item) => item.amount > minAmount,
     },
     {
-      filter: maxAmount,
+      label: "Max amount",
+      type: "number",
+      value: maxAmount,
       filterFunc: (item) => item.amount < maxAmount,
     },
     {
-      filter: currency,
-      filterFunc: (item) => currency.includes(item.currency),
+      value: currencies,
+      type: "checkbox",
+      filterFunc: (item) => currencies.includes(item.currency),
+    },
+    {
+      label: "date",
+      type: "datepicker",
+      value: formatDate(date),
+      attr: "transactionDate",
     },
   ];
 
@@ -68,26 +91,24 @@ const TransactionList = ({ transactionList }) => {
       let {
         target: { checked, value },
       } = e;
-      setSearch((prevState) => ({
-        ...prevState,
-        currency: checked
-          ? [...prevState.currency, value]
-          : prevState.currency.filter((c) => c !== value),
+      setSearch(({ currencies, ...restPrevState }) => ({
+        ...restPrevState,
+        currencies: checked
+          ? [...currencies, value]
+          : currencies.filter((c) => c !== value),
       }));
     },
     filterList: () => {
       const filteredList = transactionList.filter((c) => {
-        for (const { attr, filter, filterFunc, ...rest } of appliedFilters) {
+        for (const { attr, value, filterFunc } of appliedFilters) {
           if (attr !== "undefined" && c.hasOwnProperty(attr)) {
-            const value = c[attr].toString();
-            console.log("attr", value, value.indexOf(filter));
+            const itemValue = c[attr].toString();
 
-            if (value.indexOf(filter) === -1) return false;
+            if (itemValue.indexOf(value) === -1) return false;
           }
 
           if (filterFunc !== "undefined" && typeof filterFunc === "function") {
             const isFiltered = filterFunc(c);
-            console.log("isFiltered", isFiltered);
             if (!isFiltered) return false;
           }
         }
@@ -100,16 +121,16 @@ const TransactionList = ({ transactionList }) => {
   };
 
   useEffect(() => {
-    // const appliedFilters = {};
-    // for (let key in search) {
-    //   if (!_.isEmpty(search[key])) appliedFilters[key] = search[key];
-    // }
-
     const filteredList = operations.filterList();
     console.log("filteredList", filteredList);
 
     setList(filteredList);
-  }, [search]);
+  }, [search, currentPage]);
+
+  const currentList = list.slice(
+    (currentPage - 1) * PER_PAGE,
+    currentPage * PER_PAGE
+  );
 
   return (
     <>
@@ -158,7 +179,7 @@ const TransactionList = ({ transactionList }) => {
                   onClick={operations.handleCurrencyChange}
                   value={curr}
                   label={curr}
-                  checked={currency.includes(curr)}
+                  checked={currencies.includes(curr)}
                 />
               ))}
             </FormGroup>
@@ -179,27 +200,27 @@ const TransactionList = ({ transactionList }) => {
         </Grid>
       </Box>
 
-      <Box marginTop={3}>
+      <Box marginY={3}>
         <TableContainer>
           <Table>
             <TableHead>
               <TableRow>
-                <TableCell key="cardID">cardID</TableCell>
-                <TableCell key="cardAccount">cardAccount</TableCell>
-                <TableCell key="amount">amount</TableCell>
-                <TableCell key="currency">currency</TableCell>
-                <TableCell key="date">date</TableCell>
-                <TableCell key="detail">detail</TableCell>
+                <TableCell>cardID</TableCell>
+                <TableCell>cardAccount</TableCell>
+                <TableCell>amount</TableCell>
+                <TableCell>currency</TableCell>
+                <TableCell>date</TableCell>
+                <TableCell>detail</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
-              {list.map(({ transactionID, ...restItem }) => (
+              {currentList.map(({ transactionID, ...restItem }, index) => (
                 <TableRow key={transactionID}>
                   <TableCell>{restItem.cardID}</TableCell>
                   <TableCell>{restItem.cardAccount}</TableCell>
                   <TableCell>{restItem.amount}</TableCell>
-                  <TableCell>{restItem.transactionDate}</TableCell>
                   <TableCell>{restItem.currency}</TableCell>
+                  <TableCell>{restItem.transactionDate}</TableCell>
                   <TableCell>
                     <Link to={`${match.url}/${transactionID}`}>View</Link>
                   </TableCell>
@@ -209,34 +230,15 @@ const TransactionList = ({ transactionList }) => {
           </Table>
         </TableContainer>
       </Box>
+
+      <Pagination
+        list={list}
+        currentPage={currentPage}
+        perPage={PER_PAGE}
+        setCurrentPage={setCurrentPage}
+      />
     </>
   );
 };
 
 export default TransactionList;
-
-// const filteredList = transactionList.filter((c) => {
-//   let inArray = true;
-//   if (!_.isEmpty(cardID) && c.cardID != cardID) {
-//     inArray = false;
-//   }
-
-//   if (!_.isEmpty(cardAccount) && c.cardAccount != cardAccount) {
-//     inArray = false;
-//   }
-
-//   if (!_.isEmpty(minAmount) && c.amount < minAmount) {
-//     inArray = false;
-//   }
-
-//   if (!_.isEmpty(maxAmount) && c.amount > maxAmount) {
-//     inArray = false;
-//   }
-
-//   if (!_.isEmpty(currency) && !currency.includes(c.currency)) {
-//     inArray = false;
-//   }
-//   console.log("inArray", c, inArray);
-
-//   return inArray;
-// });
