@@ -1,30 +1,28 @@
-import React from "react";
-import { useHistory, useParams } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
 import { transactionListMock } from "../Data";
 
 export default function TransactionItem() {
   const { transactionId } = useParams();
-  const history = useHistory();
-  console.log("history", history);
+  const [transactionItem, setTransactionItem] = useState({});
 
-  const transactionItem = transactionListMock.find(
-    (item) => item.transactionID === transactionId
-  );
+  useEffect(() => {
+    const item = transactionListMock.find(
+      (item) => item.transactionID === parseInt(transactionId)
+    );
 
-  const handleClick = (path) => {
-    history.push(path);
-  };
+    setTransactionItem(item);
+  }, [transactionId]);
 
   return (
-    <div>
-      transactionId: {transactionId} - cardAccount:{" "}
-      <button
-        onClick={() =>
-          handleClick(`${history.location.pathname}/${transactionItem.cardID}`)
-        }
-      >
-        {transactionItem.cardAccount}
-      </button>
-    </div>
+    <ul>
+      <li>transactionID: {transactionItem.transactionID}</li>
+      <li>cardAccount: {transactionItem.cardAccount}</li>
+      <li>cardID: {transactionItem.cardID}</li>
+      <li>amount: {transactionItem.amount}</li>
+      <li>currency: {transactionItem.currency}</li>
+      <li>transactionDate: {transactionItem.transactionDate}</li>
+      <li>merchantInfo: {transactionItem.merchantInfo}</li>
+    </ul>
   );
 }

@@ -1,36 +1,30 @@
-import { Box, Button } from "@material-ui/core";
-import { Route, Switch, useHistory } from "react-router-dom";
+import { Route, Switch } from "react-router-dom";
 import "./App.css";
 import { TransactionList, CardList, TransactionItem } from "./components";
+import Breadcrumb from "./components/Breadcrumb";
+import LinkList from "./components/LinkList";
 import CardItem from "./components/CardItem";
 import { cardListMock, transactionListMock } from "./Data";
 
 function App() {
-  const history = useHistory();
-
-  const handleClick = (path) => {
-    history.push(path);
-  };
+  const links = [
+    {
+      to: "/transactions",
+      title: "Transactions",
+    },
+    {
+      to: "/cards",
+      title: "Cards",
+    },
+  ];
 
   return (
     <>
-      <Box>
-        <Button
-          variant="contained"
-          onClick={() => handleClick("/transactions")}
-        >
-          Transactions
-        </Button>
-        <Button variant="contained" onClick={() => handleClick("/cards")}>
-          Cards
-        </Button>
-      </Box>
+      <LinkList links={links} />
+
+      <Breadcrumb />
 
       <Switch>
-        <Route
-          path="/transactions/:transactionId/:cardID"
-          component={CardItem}
-        />
         <Route
           path="/transactions/:transactionId"
           component={TransactionItem}
