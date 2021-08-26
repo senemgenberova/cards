@@ -12,10 +12,8 @@ import {
   FormGroup,
   Paper,
   Box,
-  ButtonGroup,
-  Button,
 } from "@material-ui/core";
-import { currencyListMock } from "../Data";
+import { currencyListMock, transactionListMock } from "../Data";
 import CheckBox from "../Elements/CheckBox";
 import _ from "lodash";
 import { formatDate } from "../Utils";
@@ -23,13 +21,16 @@ import Pagination from "../Elements/Pagination";
 
 const PER_PAGE = 10;
 
-const TransactionList = ({ transactionList }) => {
-  const match = useRouteMatch();
+const TransactionList = () => {
+  const {
+    url,
+    params: { cardId },
+  } = useRouteMatch();
 
   const [list, setList] = useState([]);
 
   const [search, setSearch] = useState({
-    cardID: "",
+    cardID: cardId ?? "",
     cardAccount: "",
     minAmount: "",
     maxAmount: "",
@@ -45,11 +46,13 @@ const TransactionList = ({ transactionList }) => {
   const filterProps = [
     {
       label: "cardID",
+      type: "text",
       value: cardID,
       attr: "cardID",
     },
     {
       label: "cardAccount",
+      type: "text",
       value: cardAccount,
       attr: "cardAccount",
     },
@@ -68,6 +71,7 @@ const TransactionList = ({ transactionList }) => {
     {
       value: currencies,
       type: "checkbox",
+      data: currencyListMock,
       filterFunc: (item) => currencies.includes(item.currency),
     },
     {
@@ -78,7 +82,7 @@ const TransactionList = ({ transactionList }) => {
     },
   ];
 
-  const appliedFilters = filterProps.filter(({ filter }) => !_.isEmpty(filter));
+  const appliedFilters = filterProps.filter(({ value }) => !_.isEmpty(value));
 
   const operations = {
     handleChange: (name) => (e) => {
@@ -87,22 +91,25 @@ const TransactionList = ({ transactionList }) => {
         [name]: e.target.value,
       }));
     },
-    handleCurrencyChange: (e) => {
+    handleCheckBoxChange: (name) => (e) => {
       let {
         target: { checked, value },
       } = e;
-      setSearch(({ currencies, ...restPrevState }) => ({
-        ...restPrevState,
-        currencies: checked
-          ? [...currencies, value]
-          : currencies.filter((c) => c !== value),
+
+      setSearch((prevState) => ({
+        ...prevState,
+        [name]: checked
+          ? [...prevState[name], value]
+          : prevState[name].filter((c) => c !== value),
       }));
     },
     filterList: () => {
-      const filteredList = transactionList.filter((c) => {
+      const filteredList = transactionListMock.filter((c) => {
         for (const { attr, value, filterFunc } of appliedFilters) {
+          console.log("attr", attr, filterFunc);
           if (attr !== "undefined" && c.hasOwnProperty(attr)) {
             const itemValue = c[attr].toString();
+            console.log("itemValue", itemValue);
 
             if (itemValue.indexOf(value) === -1) return false;
           }
@@ -136,14 +143,16 @@ const TransactionList = ({ transactionList }) => {
     <>
       <Box component={Paper} elevation={3} padding={2}>
         <Grid container spacing={5}>
-          <Grid item md={2}>
-            <TextField
-              value={cardID}
-              label="cardID"
-              fullWidth
-              onChange={operations.handleChange("cardID")}
-            />
-          </Grid>
+          {!cardId && (
+            <Grid item md={2}>
+              <TextField
+                value={cardID}
+                label="cardID"
+                fullWidth
+                onChange={operations.handleChange("cardID")}
+              />
+            </Grid>
+          )}
 
           <Grid item md={2}>
             <TextField
@@ -176,7 +185,7 @@ const TransactionList = ({ transactionList }) => {
               {currencyListMock.map((curr) => (
                 <CheckBox
                   key={curr}
-                  onClick={operations.handleCurrencyChange}
+                  onClick={operations.handleCheckBoxChange("currencies")}
                   value={curr}
                   label={curr}
                   checked={currencies.includes(curr)}
@@ -222,7 +231,7 @@ const TransactionList = ({ transactionList }) => {
                   <TableCell>{restItem.currency}</TableCell>
                   <TableCell>{restItem.transactionDate}</TableCell>
                   <TableCell>
-                    <Link to={`${match.url}/${transactionID}`}>View</Link>
+                    <Link to={`${url}/${transactionID}`}>View</Link>
                   </TableCell>
                 </TableRow>
               ))}
