@@ -64,6 +64,7 @@ const CardList = ({ cardFilters, updateCardFilters }) => {
     filterProps,
     filters,
     setFilters,
+    setCurrentPage,
     updateCardFilters
   );
 

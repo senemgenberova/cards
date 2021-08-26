@@ -81,6 +81,7 @@ const TransactionList = ({
     filterProps,
     filters,
     setFilters,
+    setCurrentPage,
     cardId ? updateCardTransactionFilters : updateTransactionFilters
   );
 

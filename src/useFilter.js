@@ -6,6 +6,7 @@ export default function useFilter(
   filterProps,
   filters,
   setFilters,
+  setPage,
   setFiltersToStore
 ) {
   const [list, setList] = useState([]);
@@ -57,6 +58,7 @@ export default function useFilter(
     setFiltersToStore(filters);
 
     setList(operations.filterList());
+    setPage(1);
   }, [filters]);
 
   return {
