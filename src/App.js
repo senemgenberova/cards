@@ -1,12 +1,9 @@
 import { Redirect, Route, Switch } from "react-router-dom";
 import { Box } from "@material-ui/core";
-import {
-  TransactionList,
-  CardList,
-  TransactionItem,
-  CardItem,
-} from "./Components";
+import { TransactionList, TransactionItem, CardItem } from "./Components";
 import { Breadcrumb, LinkList } from "./Elements";
+import TransactionPage from "./Pages/TransactionPage";
+import CardPage from "./Pages/CardPage";
 
 function App() {
   const links = [
@@ -37,7 +34,7 @@ function App() {
           component={TransactionItem}
         />
 
-        <Route path="/transactions" component={TransactionList} />
+        <Route path="/transactions" component={TransactionPage} />
 
         <Route
           path="/cards/:cardId/transactions/:transactionId"
@@ -48,7 +45,7 @@ function App() {
 
         <Route path="/cards/:cardId" component={CardItem} />
 
-        <Route path="/cards" component={CardList} />
+        <Route path="/cards" component={CardPage} />
 
         <Redirect exact from="/" to="/transactions" />
       </Switch>

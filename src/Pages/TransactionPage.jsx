@@ -1,40 +1,24 @@
 import React, { useState, useEffect } from "react";
-import { Link, useRouteMatch } from "react-router-dom";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Grid,
-  TextField,
-  FormGroup,
-  Paper,
-  Box,
-} from "@material-ui/core";
-import { currencyListMock, transactionListMock } from "../Data";
-import CheckBox from "../Elements/CheckBox";
-import _ from "lodash";
-import { formatDate } from "../Utils";
-import Pagination from "../Elements/Pagination";
+import { useParams } from "react-router-dom";
 import { connect } from "react-redux";
+import { Grid, TextField, FormGroup, Paper, Box } from "@material-ui/core";
+import { currencyListMock, transactionListMock } from "../Data";
+import { CheckBox, Pagination } from "../Elements";
+import { formatDate } from "../Utils";
 import {
   updateTransactionFilters,
   updateCardTransactionFilters,
 } from "../Redux/actions";
 import useFilter from "../useFilter";
+import { TransactionList } from "../Components";
 
-const TransactionList = ({
+const Transaction = ({
   transactionFilters,
   updateTransactionFilters,
   cardTransactionFilters,
   updateCardTransactionFilters,
 }) => {
-  const {
-    url,
-    params: { cardId },
-  } = useRouteMatch();
+  const { cardId } = useParams();
 
   const [currentPage, setCurrentPage] = useState(1);
   const [filters, setFilters] = useState({
@@ -168,38 +152,7 @@ const TransactionList = ({
       </Box>
 
       <Box marginY={3}>
-        {currentList.length === 0 ? (
-          "No data found"
-        ) : (
-          <TableContainer>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell>cardID</TableCell>
-                  <TableCell>cardAccount</TableCell>
-                  <TableCell>amount</TableCell>
-                  <TableCell>currency</TableCell>
-                  <TableCell>date</TableCell>
-                  <TableCell>detail</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {currentList.map(({ transactionID, ...restItem }, index) => (
-                  <TableRow key={transactionID}>
-                    <TableCell>{restItem.cardID}</TableCell>
-                    <TableCell>{restItem.cardAccount}</TableCell>
-                    <TableCell>{restItem.amount}</TableCell>
-                    <TableCell>{restItem.currency}</TableCell>
-                    <TableCell>{restItem.transactionDate}</TableCell>
-                    <TableCell>
-                      <Link to={`${url}/${transactionID}`}>View</Link>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
-        )}
+        <TransactionList list={currentList} />
       </Box>
 
       <Pagination
@@ -224,4 +177,4 @@ const mapDispatchToProps = (dispatch) => ({
     dispatch(updateCardTransactionFilters(value)),
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(TransactionList);
+export default connect(mapStateToProps, mapDispatchToProps)(Transaction);

@@ -1,19 +1,5 @@
 import React, { useState } from "react";
-import { Link, useRouteMatch } from "react-router-dom";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Grid,
-  TextField,
-  FormGroup,
-  Paper,
-  Box,
-} from "@material-ui/core";
-
+import { Grid, TextField, FormGroup, Paper, Box } from "@material-ui/core";
 import { connect } from "react-redux";
 import { CheckBox, Pagination } from "../Elements";
 import { updateCardFilters } from "../Redux/actions";
@@ -24,10 +10,9 @@ import {
   STATUS_ACTIVE,
   STATUS_BLOCKED,
 } from "../Data";
+import { CardList } from "../Components";
 
-const CardList = ({ cardFilters, updateCardFilters }) => {
-  const { url } = useRouteMatch();
-
+const Card = ({ cardFilters, updateCardFilters }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [filters, setFilters] = useState(
     cardFilters ?? {
@@ -129,36 +114,7 @@ const CardList = ({ cardFilters, updateCardFilters }) => {
       </Box>
 
       <Box marginY={3}>
-        {currentList.length === 0 ? (
-          "No data found"
-        ) : (
-          <TableContainer>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell>cardID</TableCell>
-                  <TableCell>cardAccount</TableCell>
-                  <TableCell>currency</TableCell>
-                  <TableCell>status</TableCell>
-                  <TableCell>detail</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {currentList.map(({ cardID, ...restItem }, index) => (
-                  <TableRow key={cardID}>
-                    <TableCell>{cardID}</TableCell>
-                    <TableCell>{restItem.cardAccount}</TableCell>
-                    <TableCell>{restItem.currency}</TableCell>
-                    <TableCell>{restItem.status}</TableCell>
-                    <TableCell>
-                      <Link to={`${url}/${cardID}`}>View</Link>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
-        )}
+        <CardList list={currentList} />
       </Box>
 
       <Pagination
@@ -179,4 +135,4 @@ const mapDispatchToProps = (dispatch) => ({
   updateCardFilters: (value) => dispatch(updateCardFilters(value)),
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(CardList);
+export default connect(mapStateToProps, mapDispatchToProps)(Card);
