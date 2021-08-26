@@ -129,32 +129,36 @@ const CardList = ({ cardFilters, updateCardFilters }) => {
       </Box>
 
       <Box marginY={3}>
-        <TableContainer>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell>cardID</TableCell>
-                <TableCell>cardAccount</TableCell>
-                <TableCell>currency</TableCell>
-                <TableCell>status</TableCell>
-                <TableCell>detail</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {currentList.map(({ cardID, ...restItem }, index) => (
-                <TableRow key={cardID}>
-                  <TableCell>{cardID}</TableCell>
-                  <TableCell>{restItem.cardAccount}</TableCell>
-                  <TableCell>{restItem.currency}</TableCell>
-                  <TableCell>{restItem.status}</TableCell>
-                  <TableCell>
-                    <Link to={`${url}/${cardID}`}>View</Link>
-                  </TableCell>
+        {currentList.length === 0 ? (
+          "No data found"
+        ) : (
+          <TableContainer>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell>cardID</TableCell>
+                  <TableCell>cardAccount</TableCell>
+                  <TableCell>currency</TableCell>
+                  <TableCell>status</TableCell>
+                  <TableCell>detail</TableCell>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
+              </TableHead>
+              <TableBody>
+                {currentList.map(({ cardID, ...restItem }, index) => (
+                  <TableRow key={cardID}>
+                    <TableCell>{cardID}</TableCell>
+                    <TableCell>{restItem.cardAccount}</TableCell>
+                    <TableCell>{restItem.currency}</TableCell>
+                    <TableCell>{restItem.status}</TableCell>
+                    <TableCell>
+                      <Link to={`${url}/${cardID}`}>View</Link>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        )}
       </Box>
 
       <Pagination

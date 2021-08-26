@@ -168,34 +168,38 @@ const TransactionList = ({
       </Box>
 
       <Box marginY={3}>
-        <TableContainer>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell>cardID</TableCell>
-                <TableCell>cardAccount</TableCell>
-                <TableCell>amount</TableCell>
-                <TableCell>currency</TableCell>
-                <TableCell>date</TableCell>
-                <TableCell>detail</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {currentList.map(({ transactionID, ...restItem }, index) => (
-                <TableRow key={transactionID}>
-                  <TableCell>{restItem.cardID}</TableCell>
-                  <TableCell>{restItem.cardAccount}</TableCell>
-                  <TableCell>{restItem.amount}</TableCell>
-                  <TableCell>{restItem.currency}</TableCell>
-                  <TableCell>{restItem.transactionDate}</TableCell>
-                  <TableCell>
-                    <Link to={`${url}/${transactionID}`}>View</Link>
-                  </TableCell>
+        {currentList.length === 0 ? (
+          "No data found"
+        ) : (
+          <TableContainer>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell>cardID</TableCell>
+                  <TableCell>cardAccount</TableCell>
+                  <TableCell>amount</TableCell>
+                  <TableCell>currency</TableCell>
+                  <TableCell>date</TableCell>
+                  <TableCell>detail</TableCell>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
+              </TableHead>
+              <TableBody>
+                {currentList.map(({ transactionID, ...restItem }, index) => (
+                  <TableRow key={transactionID}>
+                    <TableCell>{restItem.cardID}</TableCell>
+                    <TableCell>{restItem.cardAccount}</TableCell>
+                    <TableCell>{restItem.amount}</TableCell>
+                    <TableCell>{restItem.currency}</TableCell>
+                    <TableCell>{restItem.transactionDate}</TableCell>
+                    <TableCell>
+                      <Link to={`${url}/${transactionID}`}>View</Link>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        )}
       </Box>
 
       <Pagination
