@@ -88,6 +88,10 @@ const TransactionList = ({
     const pageFilter = cardId ? cardTransactionFilters : transactionFilters;
 
     setFilters(pageFilter ?? filters);
+
+    return () => {
+      !cardId && updateCardTransactionFilters(null);
+    };
   }, [cardId]);
 
   const currentList = list.slice((currentPage - 1) * 10, currentPage * 10);
