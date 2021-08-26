@@ -23,8 +23,7 @@ import {
   updateTransactionFilters,
   updateCardTransactionFilters,
 } from "../Redux/actions";
-
-const PER_PAGE = 10;
+import useFilter from "../useFilter";
 
 const TransactionList = ({
   transactionFilters,
@@ -37,9 +36,8 @@ const TransactionList = ({
     params: { cardId },
   } = useRouteMatch();
 
-  const [list, setList] = useState([]);
-
-  const [filter, setFilter] = useState({
+  const [currentPage, setCurrentPage] = useState(1);
+  const [filters, setFilters] = useState({
     cardID: cardId ?? "",
     cardAccount: "",
     minAmount: "",
@@ -48,10 +46,8 @@ const TransactionList = ({
     date: "",
   });
 
-  const [currentPage, setCurrentPage] = useState(1);
-
   const { cardID, cardAccount, minAmount, maxAmount, currencies, date } =
-    filter;
+    filters;
 
   const filterProps = [
     {
@@ -80,71 +76,21 @@ const TransactionList = ({
     },
   ];
 
-  const appliedFilters = filterProps.filter(({ value }) => !_.isEmpty(value));
-
-  const operations = {
-    handleChange: (name) => (e) => {
-      setFilter((prevState) => ({
-        ...prevState,
-        [name]: e.target.value,
-      }));
-    },
-    handleCheckBoxChange: (name) => (e) => {
-      let {
-        target: { checked, value },
-      } = e;
-
-      setFilter((prevState) => ({
-        ...prevState,
-        [name]: checked
-          ? [...prevState[name], value]
-          : prevState[name].filter((c) => c !== value),
-      }));
-    },
-    filterList: () => {
-      const filteredList = transactionListMock.filter((c) => {
-        for (const { attr, value, filterFunc } of appliedFilters) {
-          if (attr !== "undefined" && c.hasOwnProperty(attr)) {
-            const itemValue = c[attr].toString();
-
-            if (itemValue.indexOf(value) === -1) return false;
-          }
-
-          if (filterFunc !== "undefined" && typeof filterFunc === "function") {
-            const isFiltered = filterFunc(c);
-            if (!isFiltered) return false;
-          }
-        }
-
-        return true;
-      });
-
-      return filteredList;
-    },
-  };
+  const { handleChange, handleCheckBoxChange, list } = useFilter(
+    transactionListMock,
+    filterProps,
+    filters,
+    setFilters,
+    cardId ? updateCardTransactionFilters : updateTransactionFilters
+  );
 
   useEffect(() => {
-    const filters = cardId ? cardTransactionFilters : transactionFilters;
+    const pageFilter = cardId ? cardTransactionFilters : transactionFilters;
 
-    setFilter(filters ?? filter);
+    setFilters(pageFilter ?? filters);
   }, [cardId]);
 
-  useEffect(() => {
-    if (cardId) {
-      updateCardTransactionFilters(filter);
-    } else {
-      updateTransactionFilters(filter);
-    }
-
-    const filteredList = operations.filterList();
-
-    setList(filteredList);
-  }, [filter]);
-
-  const currentList = list.slice(
-    (currentPage - 1) * PER_PAGE,
-    currentPage * PER_PAGE
-  );
+  const currentList = list.slice((currentPage - 1) * 10, currentPage * 10);
 
   return (
     <>
@@ -156,7 +102,7 @@ const TransactionList = ({
                 value={cardID}
                 label="cardID"
                 fullWidth
-                onChange={operations.handleChange("cardID")}
+                onChange={handleChange("cardID")}
               />
             </Grid>
           )}
@@ -166,7 +112,7 @@ const TransactionList = ({
               value={cardAccount}
               label="cardAccount"
               fullWidth
-              onChange={operations.handleChange("cardAccount")}
+              onChange={handleChange("cardAccount")}
             />
           </Grid>
 
@@ -176,14 +122,14 @@ const TransactionList = ({
               label="Min amount"
               type="number"
               fullWidth
-              onChange={operations.handleChange("minAmount")}
+              onChange={handleChange("minAmount")}
             />
             <TextField
               value={maxAmount}
               label="Max amount"
               type="number"
               fullWidth
-              onChange={operations.handleChange("maxAmount")}
+              onChange={handleChange("maxAmount")}
             />
           </Grid>
 
@@ -192,7 +138,7 @@ const TransactionList = ({
               {currencyListMock.map((curr) => (
                 <CheckBox
                   key={curr}
-                  onClick={operations.handleCheckBoxChange("currencies")}
+                  onClick={handleCheckBoxChange("currencies")}
                   value={curr}
                   label={curr}
                   checked={currencies.length > 0 && currencies.includes(curr)}
@@ -210,7 +156,7 @@ const TransactionList = ({
                 shrink: true,
               }}
               fullWidth
-              onChange={operations.handleChange("date")}
+              onChange={handleChange("date")}
             />
           </Grid>
         </Grid>
@@ -250,7 +196,7 @@ const TransactionList = ({
       <Pagination
         list={list}
         currentPage={currentPage}
-        perPage={PER_PAGE}
+        perPage={10}
         setCurrentPage={setCurrentPage}
       />
     </>

@@ -1,14 +1,12 @@
 import { Redirect, Route, Switch } from "react-router-dom";
-import "./App.css";
+import { Box } from "@material-ui/core";
 import {
   TransactionList,
   CardList,
   TransactionItem,
   CardItem,
 } from "./Components";
-import Breadcrumb from "./Elements/Breadcrumb";
-import LinkList from "./Elements/LinkList";
-import { Box } from "@material-ui/core";
+import { Breadcrumb, LinkList } from "./Elements";
 
 function App() {
   const links = [

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Link, useRouteMatch } from "react-router-dom";
 import {
   Table,
@@ -13,25 +13,23 @@ import {
   Paper,
   Box,
 } from "@material-ui/core";
+
+import { connect } from "react-redux";
+import { CheckBox, Pagination } from "../Elements";
+import { updateCardFilters } from "../Redux/actions";
+import useFilter from "../useFilter";
 import {
   cardListMock,
   currencyListMock,
   STATUS_ACTIVE,
   STATUS_BLOCKED,
 } from "../Data";
-import CheckBox from "../Elements/CheckBox";
-import _ from "lodash";
-import Pagination from "../Elements/Pagination";
-import { connect } from "react-redux";
-import { updateCardFilters } from "../Redux/actions";
-
-const PER_PAGE = 10;
 
 const CardList = ({ cardFilters, updateCardFilters }) => {
   const { url } = useRouteMatch();
 
-  const [list, setList] = useState([]);
-  const [filter, setFilter] = useState(
+  const [currentPage, setCurrentPage] = useState(1);
+  const [filters, setFilters] = useState(
     cardFilters ?? {
       cardID: "",
       cardAccount: "",
@@ -39,9 +37,8 @@ const CardList = ({ cardFilters, updateCardFilters }) => {
       statuses: [],
     }
   );
-  const [currentPage, setCurrentPage] = useState(1);
 
-  const { cardID, cardAccount, currencies, statuses } = filter;
+  const { cardID, cardAccount, currencies, statuses } = filters;
 
   const filterProps = [
     {
@@ -62,60 +59,15 @@ const CardList = ({ cardFilters, updateCardFilters }) => {
     },
   ];
 
-  const appliedFilters = filterProps.filter(({ value }) => !_.isEmpty(value));
-
-  const operations = {
-    handleChange: (name) => (e) => {
-      setFilter((prevState) => ({
-        ...prevState,
-        [name]: e.target.value,
-      }));
-    },
-    handleCheckBoxChange: (name) => (e) => {
-      let {
-        target: { checked, value },
-      } = e;
-
-      setFilter((prevState) => ({
-        ...prevState,
-        [name]: checked
-          ? [...prevState[name], value]
-          : prevState[name].filter((c) => c !== value),
-      }));
-    },
-    filterList: () => {
-      const filteredList = cardListMock.filter((c) => {
-        for (const { attr, value, filterFunc } of appliedFilters) {
-          if (attr !== "undefined" && c.hasOwnProperty(attr)) {
-            const itemValue = c[attr].toString();
-
-            if (itemValue.indexOf(value) === -1) return false;
-          }
-
-          if (filterFunc !== "undefined" && typeof filterFunc === "function") {
-            const isFiltered = filterFunc(c);
-            if (!isFiltered) return false;
-          }
-        }
-
-        return true;
-      });
-
-      return filteredList;
-    },
-  };
-
-  useEffect(() => {
-    updateCardFilters(filter);
-    const filteredList = operations.filterList();
-
-    setList(filteredList);
-  }, [filter]);
-
-  const currentList = list.slice(
-    (currentPage - 1) * PER_PAGE,
-    currentPage * PER_PAGE
+  const { handleChange, handleCheckBoxChange, list } = useFilter(
+    cardListMock,
+    filterProps,
+    filters,
+    setFilters,
+    updateCardFilters
   );
+
+  const currentList = list.slice((currentPage - 1) * 10, currentPage * 10);
 
   return (
     <>
@@ -126,7 +78,7 @@ const CardList = ({ cardFilters, updateCardFilters }) => {
               value={cardID}
               label="cardID"
               fullWidth
-              onChange={operations.handleChange("cardID")}
+              onChange={handleChange("cardID")}
             />
           </Grid>
 
@@ -135,7 +87,7 @@ const CardList = ({ cardFilters, updateCardFilters }) => {
               value={cardAccount}
               label="cardAccount"
               fullWidth
-              onChange={operations.handleChange("cardAccount")}
+              onChange={handleChange("cardAccount")}
             />
           </Grid>
 
@@ -144,7 +96,7 @@ const CardList = ({ cardFilters, updateCardFilters }) => {
               {currencyListMock.map((curr) => (
                 <CheckBox
                   key={curr}
-                  onClick={operations.handleCheckBoxChange("currencies")}
+                  onClick={handleCheckBoxChange("currencies")}
                   value={curr}
                   label={curr}
                   checked={
@@ -162,7 +114,7 @@ const CardList = ({ cardFilters, updateCardFilters }) => {
               {[STATUS_ACTIVE, STATUS_BLOCKED].map((curr) => (
                 <CheckBox
                   key={curr}
-                  onClick={operations.handleCheckBoxChange("statuses")}
+                  onClick={handleCheckBoxChange("statuses")}
                   value={curr}
                   label={curr}
                   checked={
@@ -207,7 +159,7 @@ const CardList = ({ cardFilters, updateCardFilters }) => {
       <Pagination
         list={list}
         currentPage={currentPage}
-        perPage={PER_PAGE}
+        perPage={10}
         setCurrentPage={setCurrentPage}
       />
     </>
