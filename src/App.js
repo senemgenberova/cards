@@ -1,6 +1,6 @@
 import { Redirect, Route, Switch } from "react-router-dom";
 import { Box } from "@material-ui/core";
-import { TransactionList, TransactionItem, CardItem } from "./Components";
+import { TransactionItem, CardItem } from "./Components";
 import { Breadcrumb, LinkList } from "./Elements";
 import TransactionPage from "./Pages/TransactionPage";
 import CardPage from "./Pages/CardPage";
@@ -41,7 +41,7 @@ function App() {
           component={TransactionItem}
         />
 
-        <Route path="/cards/:cardId/transactions" component={TransactionList} />
+        <Route path="/cards/:cardId/transactions" component={TransactionPage} />
 
         <Route path="/cards/:cardId" component={CardItem} />
 

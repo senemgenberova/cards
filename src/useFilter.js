@@ -9,6 +9,7 @@ export default function useFilter(
   setPage,
   setFiltersToStore
 ) {
+  console.log("useFilter", filters);
   const [list, setList] = useState([]);
 
   const appliedFilters = filterProps.filter(({ value }) => !_.isEmpty(value));
@@ -25,12 +26,15 @@ export default function useFilter(
         target: { checked, value },
       } = e;
 
-      setFilters((prevState) => ({
-        ...prevState,
-        [name]: checked
-          ? [...prevState[name], value]
-          : prevState[name].filter((c) => c !== value),
-      }));
+      setFilters((prevState) => {
+        const arrayFilter = prevState[name] ?? [];
+        return {
+          ...prevState,
+          [name]: checked
+            ? [...arrayFilter, value]
+            : arrayFilter.filter((c) => c !== value),
+        };
+      });
     },
     filterList: () => {
       const filteredList = mockList.filter((c) => {

@@ -26,7 +26,7 @@ const Transaction = ({
     cardAccount: "",
     minAmount: "",
     maxAmount: "",
-    currencies: "",
+    currencies: [],
     date: "",
   });
 
@@ -44,11 +44,11 @@ const Transaction = ({
     },
     {
       value: minAmount,
-      filterFunc: (item) => item.amount > minAmount,
+      filterFunc: (item) => item.amount >= minAmount,
     },
     {
       value: maxAmount,
-      filterFunc: (item) => item.amount < maxAmount,
+      filterFunc: (item) => item.amount <= maxAmount,
     },
     {
       value: currencies,
@@ -70,13 +70,12 @@ const Transaction = ({
   );
 
   useEffect(() => {
-    const pageFilter = cardId ? cardTransactionFilters : transactionFilters;
+    const pageFilter = cardId
+      ? { ...cardTransactionFilters, cardID: cardId }
+      : transactionFilters;
+    console.log("pageFilter", pageFilter);
 
     setFilters(pageFilter ?? filters);
-
-    return () => {
-      !cardId && updateCardTransactionFilters(null);
-    };
   }, [cardId]);
 
   const currentList = list.slice((currentPage - 1) * 10, currentPage * 10);
@@ -130,7 +129,11 @@ const Transaction = ({
                   onClick={handleCheckBoxChange("currencies")}
                   value={curr}
                   label={curr}
-                  checked={currencies.length > 0 && currencies.includes(curr)}
+                  checked={
+                    currencies &&
+                    currencies.length > 0 &&
+                    currencies.includes(curr)
+                  }
                 />
               ))}
             </FormGroup>

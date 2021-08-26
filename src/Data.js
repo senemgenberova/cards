@@ -230,7 +230,7 @@ export const transactionListMock = [
   {
     transactionID: 1,
     cardAccount: "4917356524743804",
-    cardID: 4,
+    cardID: 10,
     amount: 62,
     currency: "AZN",
     transactionDate: "02/27/2022",
