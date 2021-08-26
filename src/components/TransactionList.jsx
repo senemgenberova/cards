@@ -18,10 +18,20 @@ import CheckBox from "../Elements/CheckBox";
 import _ from "lodash";
 import { formatDate } from "../Utils";
 import Pagination from "../Elements/Pagination";
+import { connect } from "react-redux";
+import {
+  updateTransactionFilters,
+  updateCardTransactionFilters,
+} from "../Redux/actions";
 
 const PER_PAGE = 10;
 
-const TransactionList = () => {
+const TransactionList = ({
+  transactionFilters,
+  updateTransactionFilters,
+  cardTransactionFilters,
+  updateCardTransactionFilters,
+}) => {
   const {
     url,
     params: { cardId },
@@ -29,54 +39,42 @@ const TransactionList = () => {
 
   const [list, setList] = useState([]);
 
-  const [search, setSearch] = useState({
+  const [filter, setFilter] = useState({
     cardID: cardId ?? "",
     cardAccount: "",
     minAmount: "",
     maxAmount: "",
-    currencies: [],
+    currencies: "",
     date: "",
   });
 
   const [currentPage, setCurrentPage] = useState(1);
 
   const { cardID, cardAccount, minAmount, maxAmount, currencies, date } =
-    search;
+    filter;
 
   const filterProps = [
     {
-      label: "cardID",
-      type: "text",
       value: cardID,
       attr: "cardID",
     },
     {
-      label: "cardAccount",
-      type: "text",
       value: cardAccount,
       attr: "cardAccount",
     },
     {
-      label: "Min amount",
-      type: "number",
       value: minAmount,
       filterFunc: (item) => item.amount > minAmount,
     },
     {
-      label: "Max amount",
-      type: "number",
       value: maxAmount,
       filterFunc: (item) => item.amount < maxAmount,
     },
     {
       value: currencies,
-      type: "checkbox",
-      data: currencyListMock,
       filterFunc: (item) => currencies.includes(item.currency),
     },
     {
-      label: "date",
-      type: "datepicker",
       value: formatDate(date),
       attr: "transactionDate",
     },
@@ -86,7 +84,7 @@ const TransactionList = () => {
 
   const operations = {
     handleChange: (name) => (e) => {
-      setSearch((prevState) => ({
+      setFilter((prevState) => ({
         ...prevState,
         [name]: e.target.value,
       }));
@@ -96,7 +94,7 @@ const TransactionList = () => {
         target: { checked, value },
       } = e;
 
-      setSearch((prevState) => ({
+      setFilter((prevState) => ({
         ...prevState,
         [name]: checked
           ? [...prevState[name], value]
@@ -106,10 +104,8 @@ const TransactionList = () => {
     filterList: () => {
       const filteredList = transactionListMock.filter((c) => {
         for (const { attr, value, filterFunc } of appliedFilters) {
-          console.log("attr", attr, filterFunc);
           if (attr !== "undefined" && c.hasOwnProperty(attr)) {
             const itemValue = c[attr].toString();
-            console.log("itemValue", itemValue);
 
             if (itemValue.indexOf(value) === -1) return false;
           }
@@ -128,11 +124,22 @@ const TransactionList = () => {
   };
 
   useEffect(() => {
+    const filters = cardId ? cardTransactionFilters : transactionFilters;
+
+    setFilter(filters ?? filter);
+  }, [cardId]);
+
+  useEffect(() => {
+    if (cardId) {
+      updateCardTransactionFilters(filter);
+    } else {
+      updateTransactionFilters(filter);
+    }
+
     const filteredList = operations.filterList();
-    console.log("filteredList", filteredList);
 
     setList(filteredList);
-  }, [search, currentPage]);
+  }, [filter]);
 
   const currentList = list.slice(
     (currentPage - 1) * PER_PAGE,
@@ -188,7 +195,7 @@ const TransactionList = () => {
                   onClick={operations.handleCheckBoxChange("currencies")}
                   value={curr}
                   label={curr}
-                  checked={currencies.includes(curr)}
+                  checked={currencies.length > 0 && currencies.includes(curr)}
                 />
               ))}
             </FormGroup>
@@ -250,4 +257,16 @@ const TransactionList = () => {
   );
 };
 
-export default TransactionList;
+const mapStateToProps = ({ filterReducer }) => ({
+  transactionFilters: filterReducer.transactionFilters,
+  cardTransactionFilters: filterReducer.cardTransactionFilters,
+});
+
+const mapDispatchToProps = (dispatch) => ({
+  updateTransactionFilters: (value) =>
+    dispatch(updateTransactionFilters(value)),
+  updateCardTransactionFilters: (value) =>
+    dispatch(updateCardTransactionFilters(value)),
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(TransactionList);

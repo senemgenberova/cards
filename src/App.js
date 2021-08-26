@@ -1,10 +1,13 @@
-import { Route, Switch } from "react-router-dom";
+import { Redirect, Route, Switch } from "react-router-dom";
 import "./App.css";
-import { TransactionList, CardList, TransactionItem } from "./components";
+import {
+  TransactionList,
+  CardList,
+  TransactionItem,
+  CardItem,
+} from "./Components";
 import Breadcrumb from "./Elements/Breadcrumb";
 import LinkList from "./Elements/LinkList";
-import CardItem from "./components/CardItem";
-import { cardListMock, transactionListMock } from "./Data";
 import { Box } from "@material-ui/core";
 
 function App() {
@@ -48,6 +51,8 @@ function App() {
         <Route path="/cards/:cardId" component={CardItem} />
 
         <Route path="/cards" component={CardList} />
+
+        <Redirect exact from="/" to="/transactions" />
       </Switch>
     </Box>
   );

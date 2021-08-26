@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useRouteMatch, Link, Route } from "react-router-dom";
+import { useRouteMatch, Link } from "react-router-dom";
 import { transactionListMock } from "../Data";
 
 export default function TransactionItem() {
