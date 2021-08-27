@@ -61,7 +61,7 @@ const Card = ({ cardFilters, updateCardFilters }) => {
         <Grid container spacing={5}>
           <Grid item md={2}>
             <TextField
-              value={cardID}
+              value={cardID ?? ""}
               label="cardID"
               fullWidth
               onChange={handleChange("cardID")}
@@ -70,7 +70,7 @@ const Card = ({ cardFilters, updateCardFilters }) => {
 
           <Grid item md={2}>
             <TextField
-              value={cardAccount}
+              value={cardAccount ?? ""}
               label="cardAccount"
               fullWidth
               onChange={handleChange("cardAccount")}
@@ -86,7 +86,7 @@ const Card = ({ cardFilters, updateCardFilters }) => {
                   value={curr}
                   label={curr}
                   checked={
-                    currencies &&
+                    Array.isArray(currencies) &&
                     currencies.length > 0 &&
                     currencies.includes(curr)
                   }
@@ -104,7 +104,9 @@ const Card = ({ cardFilters, updateCardFilters }) => {
                   value={curr}
                   label={curr}
                   checked={
-                    statuses && statuses.length > 0 && statuses.includes(curr)
+                    Array.isArray(statuses) &&
+                    statuses.length > 0 &&
+                    statuses.includes(curr)
                   }
                 />
               ))}

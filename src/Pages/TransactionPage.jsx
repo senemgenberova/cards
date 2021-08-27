@@ -87,7 +87,7 @@ const Transaction = ({
           {!cardId && (
             <Grid item md={2}>
               <TextField
-                value={cardID}
+                value={cardID ?? ""}
                 label="cardID"
                 fullWidth
                 onChange={handleChange("cardID")}
@@ -97,7 +97,7 @@ const Transaction = ({
 
           <Grid item md={2}>
             <TextField
-              value={cardAccount}
+              value={cardAccount ?? ""}
               label="cardAccount"
               fullWidth
               onChange={handleChange("cardAccount")}
@@ -106,14 +106,14 @@ const Transaction = ({
 
           <Grid item container md={3} justifyContent="space-between">
             <TextField
-              value={minAmount}
+              value={minAmount ?? ""}
               label="Min amount"
               type="number"
               fullWidth
               onChange={handleChange("minAmount")}
             />
             <TextField
-              value={maxAmount}
+              value={maxAmount ?? ""}
               label="Max amount"
               type="number"
               fullWidth
@@ -130,7 +130,7 @@ const Transaction = ({
                   value={curr}
                   label={curr}
                   checked={
-                    currencies &&
+                    Array.isArray(currencies) &&
                     currencies.length > 0 &&
                     currencies.includes(curr)
                   }
@@ -141,7 +141,7 @@ const Transaction = ({
 
           <Grid item md={2}>
             <TextField
-              value={date}
+              value={date ?? ""}
               label="date"
               type="date"
               InputLabelProps={{
